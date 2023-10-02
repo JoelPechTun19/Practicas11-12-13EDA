@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Matriz y Resultados</title>
+    <style>
+        
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background-color: aquamarine;
+            display: flex;
+            justify-content: center; 
+            align-items: center;
+            height: 100vh; 
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+
+        table {
+            margin: 10px;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+        }
+
+        h1 {
+            color: black;
+        }
+
+        h2 {
+            margin-top: 20px;
+            color: black;
+        }
+        p {
+            font-weight: bold;
+        }
+
+        .table-container {
+            display: flex;
+            flex-direction: row;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Matriz de 5 x 10 y Resultados</h1>
+        <p>A: Suma por Fila</p>
+        <p>B: Promedio por Fila</p>
+        <p>C: Suma por Columna</p>
+        <p>D: Promedio por Columna</p>
+        <div class="table-container">
+            <table id="matrix"></table>
+            <table id="resultTable">
+
+            </table>
+        </div>
+        <div class="table-container">
+            <table id="resultTable2">
+                <tr>
+                    <th>C</th>
+                    <!-- Resultados de suma y promedio por columna en una tabla horizontal -->
+                </tr>
+                <tr>
+                    <th>D</th>
+                    <!-- Resultados de suma y promedio por columna en una tabla horizontal -->
+                </tr>
+            </table>
+        </div>
+    </div>
+    <script>
+        class MatrixCalculator {
+            constructor(rows, cols) {
+                this.rows = rows;
+                this.cols = cols;
+                this.matrix = this.generateMatrix();
+                this.results = {
+                    sumRow: [],
+                    avgRow: [],
+                    sumCol: [],
+                    avgCol: []
+                };
+            }
+
+            generateMatrix() {
+                const matrix = [];
+                for (let i = 0; i < this.rows; i++) {
+                    matrix.push([]);
+                    for (let j = 0; j < this.cols; j++) {
+                        matrix[i][j] = Math.floor(Math.random() * 100);
+                    }
+                }
+                return matrix;
+            }
+
+            calculateResults() {
+                for (let i = 0; i < this.rows; i++) {
+                    let rowSum = 0;
+                    for (let j = 0; j < this.cols; j++) {
+                        rowSum += this.matrix[i][j];
+                        if (!this.results.sumCol[j]) {
+                            this.results.sumCol[j] = 0;
+                        }
+                        this.results.sumCol[j] += this.matrix[i][j];
+                    }
+                    this.results.sumRow[i] = rowSum;
+                    this.results.avgRow[i] = rowSum / this.cols;
+                }
+
+                for (let j = 0; j < this.cols; j++) {
+                    this.results.avgCol[j] = this.results.sumCol[j] / this.rows;
+                }
+            }
+
+            renderMatrix() {
+                const table = document.getElementById('matrix');
+                for (let i = 0; i < this.rows; i++) {
+                    const row = table.insertRow(i);
+                    for (let j = 0; j < this.cols; j++) {
+                        const cell = row.insertCell(j);
+                        cell.textContent = this.matrix[i][j];
+                    }
+                }
+            }
+
+            renderResults() {
+                const resultTable = document.getElementById('resultTable');
+                const resultTable2 = document.getElementById('resultTable2');
+                
+                // Resultados de suma y promedio por fila en una tabla vertical
+                for (let i = 0; i < this.rows; i++) {
+                    const row = resultTable.insertRow(i);
+                    const cellA = row.insertCell(0);
+                    const cellB = row.insertCell(1);
+                    cellA.textContent = this.results.sumRow[i];
+                    cellB.textContent = this.results.avgRow[i];
+                }
+
+                const headerRow = resultTable.insertRow(0);
+                const headerCellA = headerRow.insertCell(0);
+                const headerCellB = headerRow.insertCell(1);
+                headerCellA.textContent = "A";
+                headerCellB.textContent = "B";
+                
+
+                // Resultados de suma y promedio por columna en una tabla horizontal
+                const rowC = resultTable2.rows[0];
+                    const rowD = resultTable2.rows[1];
+                    for (let j = 0; j < this.cols; j++) {
+                        const cellC = rowC.insertCell(j + 1); 
+                        const cellD = rowD.insertCell(j + 1); 
+                        cellC.textContent = this.results.sumCol[j];
+                        cellD.textContent = this.results.avgCol[j];
+                    }
+            }
+        }
+
+        const rows = 5;
+        const cols = 10;
+        const matrixCalculator = new MatrixCalculator(rows, cols);
+
+        matrixCalculator.calculateResults();
+        matrixCalculator.renderMatrix();
+        matrixCalculator.renderResults();
+    </script>
+</body>
+</html>

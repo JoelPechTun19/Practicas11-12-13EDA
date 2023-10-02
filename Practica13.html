@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: skyblue;
+        }
+
+        table, th, td {
+            border: 1px solid #333;
+        }
+
+        th, td {
+            padding: 8px 12px;
+        }
+
+        #informacion {
+            margin-top: 20px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+    </style>
+    <title>Resumen de Calificaciones</title>
+</head>
+<body>
+    <h1>Calificaciones</h1>
+    <table id="tabla-calificaciones">
+        <!-- Encabezados de la tabla -->
+        <thead>
+            <tr>
+                <th>Alumno</th>
+                <th>Parcial 1</th>
+                <th>Parcial 2</th>
+                <th>Parcial 3</th>
+                <th>Promedio</th>
+            </tr>
+        </thead>
+        <!-- El cuerpo de la tabla se generará dinámicamente con JavaScript -->
+    </table>
+    <div id="informacion">
+        <p>Promedio más alto: <span id="promedio-mas-alto"></span></p>
+        <p>Promedio más bajo: <span id="promedio-mas-bajo"></span></p>
+        <p>Parciales reprobados: <span id="parciales-reprobados"></span></p>
+        <p>Distribución de calificaciones finales:</p>
+        <ul id="distribucion">
+            <!-- La distribución se generará dinámicamente con JavaScript -->
+        </ul>
+    </div>
+    <script>
+        // Datos de calificaciones
+        const calificaciones = [
+            [5.5, 8.6, 10],
+            [8.0, 5.5, 10],
+            [9.0, 4.1, 7.8],
+            [10, 2.2, 8.1],
+            [7.0, 9.2, 7.1],
+            [9.0, 4.0, 6.0],
+            [6.5, 5.0, 5.0],
+            [4.0, 7.0, 4.0],
+            [8.0, 8.0, 9.0],
+            [10, 9.0, 9.2],
+            [5.0, 10, 8.4],
+            [9.0, 4.6, 7.5]
+        ];
+
+        // Función para calcular el promedio de un conjunto de calificaciones
+        function calcularPromedio(calificaciones) {
+            const total = calificaciones.reduce((acc, calificacion) => acc + calificacion, 0);
+            return total / calificaciones.length;
+        }
+
+        // Función para contar cuántos parciales fueron reprobados (menores a 7.0)
+        function contarReprobados(calificaciones) {
+            let totalReprobados = 0;
+
+            calificaciones.forEach(alumno => {
+                const parcialesReprobados = alumno.filter(calificacion => calificacion < 7.0).length;
+                totalReprobados += parcialesReprobados;
+            });
+
+            return totalReprobados;
+        }
+
+
+        // Función para calcular la distribución de calificaciones finales
+        function calcularDistribucion(calificaciones) {
+            const distribucion = {
+                '0 - 4.9': 0,
+                '5.0 - 5.9': 0,
+                '6.0 - 6.9': 0,
+                '7.0 - 7.9': 0,
+                '8.0 - 8.9': 0,
+                '9.0 - 10': 0
+            };
+
+            calificaciones.forEach(alumno => {
+                const promedio = calcularPromedio(alumno);
+                if (promedio >= 0 && promedio < 5.0) {
+                    distribucion['0 - 4.9']++;
+                } else if (promedio >= 5.0 && promedio < 6.0) {
+                    distribucion['5.0 - 5.9']++;
+                } else if (promedio >= 6.0 && promedio < 7.0) {
+                    distribucion['6.0 - 6.9']++;
+                } else if (promedio >= 7.0 && promedio < 8.0) {
+                    distribucion['7.0 - 7.9']++;
+                } else if (promedio >= 8.0 && promedio < 9.0) {
+                    distribucion['8.0 - 8.9']++;
+                } else {
+                    distribucion['9.0 - 10']++;
+                }
+            });
+
+            return distribucion;
+        }
+
+        // Función para mostrar la tabla de calificaciones y la información solicitada
+        function mostrarInformacion() {
+            const tabla = document.getElementById('tabla-calificaciones');
+            const informacion = document.getElementById('informacion');
+            const promedioMasAlto = document.getElementById('promedio-mas-alto');
+            const promedioMasBajo = document.getElementById('promedio-mas-bajo');
+            const parcialesReprobados = document.getElementById('parciales-reprobados');
+            const distribucion = document.getElementById('distribucion');
+
+            // Llenar la tabla de calificaciones
+            calificaciones.forEach((alumno, index) => {
+                const fila = document.createElement('tr');
+                const numeroAlumno = index + 1;
+
+                // Agregar la columna "Alumno" con el número de alumno
+                const celdaAlumno = document.createElement('td');
+                celdaAlumno.textContent = numeroAlumno;
+                fila.appendChild(celdaAlumno);
+
+                // Agregar las columnas de calificaciones
+                alumno.forEach(calificacion => {
+                    const celdaCalificacion = document.createElement('td');
+                    celdaCalificacion.textContent = calificacion.toFixed(1);
+                    fila.appendChild(celdaCalificacion);
+                });
+
+                // Calcular y agregar el promedio de cada alumno en la nueva columna
+                const promedio = calcularPromedio(alumno);
+                const celdaPromedio = document.createElement('td');
+                celdaPromedio.textContent = promedio.toFixed(2);
+                fila.appendChild(celdaPromedio);
+
+                tabla.appendChild(fila);
+            });
+
+            // Calcular y mostrar la información solicitada
+            const promedios = calificaciones.map(alumno => calcularPromedio(alumno));
+            const promedioMax = Math.max(...promedios);
+            const promedioMin = Math.min(...promedios);
+            const reprobados = contarReprobados(calificaciones);
+            const distribucionCalificaciones = calcularDistribucion(calificaciones);
+
+            promedioMasAlto.textContent = promedioMax.toFixed(2);
+            promedioMasBajo.textContent = promedioMin.toFixed(2);
+            parcialesReprobados.textContent = reprobados;
+
+            for (const rango in distribucionCalificaciones) {
+                const li = document.createElement('li');
+                li.textContent = `${rango}: ${distribucionCalificaciones[rango]} Alumnos`;
+                distribucion.appendChild(li);
+            }
+
+            informacion.style.display = 'block';
+        }
+
+        // Llamar a la función para mostrar la información cuando se cargue la página
+        window.onload = mostrarInformacion;
+    </script>
+</body>
+</html>
